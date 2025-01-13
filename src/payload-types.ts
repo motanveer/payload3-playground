@@ -13,14 +13,29 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    wizards: Wizard;
+    Houses: House;
+    Spells: Spell;
+    wands: Wand;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    wizards: {
+      Wands: 'wands';
+    };
+    Houses: {
+      Members: 'wizards';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    wizards: WizardsSelect<false> | WizardsSelect<true>;
+    Houses: HousesSelect<false> | HousesSelect<true>;
+    Spells: SpellsSelect<false> | SpellsSelect<true>;
+    wands: WandsSelect<false> | WandsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -95,6 +110,91 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wizards".
+ */
+export interface Wizard {
+  id: number;
+  name?: string | null;
+  Photo?: (number | null) | Media;
+  Info?: {
+    House?: (number | null) | House;
+    Bio?: string | null;
+  };
+  Wands?: {
+    docs?: (number | Wand)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Houses".
+ */
+export interface House {
+  id: number;
+  name: string;
+  embelem?: (number | null) | Media;
+  Description?: string | null;
+  Attributes?: {
+    Animal?: string | null;
+    Motto?: string | null;
+    Traits?: string | null;
+    Colors?: string | null;
+    Founder?: string | null;
+  };
+  notableMembers?:
+    | {
+        Wizard?: (number | null) | Wizard;
+        id?: string | null;
+      }[]
+    | null;
+  Members?: {
+    docs?: (number | Wizard)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wands".
+ */
+export interface Wand {
+  id: number;
+  name?: string | null;
+  owner?: (number | null) | Wizard;
+  'Wood Type'?: ('Holly' | 'Yew' | 'Ash' | 'Vine' | 'Elder' | 'Walnut' | 'Maple' | 'Cherry' | 'Willow') | null;
+  'Core Type'?:
+    | ('Phoenix Feather' | 'Dragon Heartstring' | 'Unicorn Hair' | 'Thestral Tail Hair' | 'Basilisk Fang')
+    | null;
+  description?: string | null;
+  attributes?: {
+    length?: number | null;
+    flexibility?: ('Unyielding' | 'Slightly Springy' | 'Supple' | 'Hard' | 'Flexible' | 'Brittle') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Spells".
+ */
+export interface Spell {
+  id: number;
+  name?: string | null;
+  Icon?: (number | null) | Media;
+  'Spell Type'?: ('Charm' | 'Hex' | 'Jinx' | 'Curse' | 'Spell' | 'Transfiguration' | 'Enchantment') | null;
+  Description?: string | null;
+  category?:
+    | ('Utility' | 'Combat' | 'Defensive' | 'Healing' | 'Offensive' | 'Fun/Entertainment' | 'Forbidden/Dark Magic')
+    | null;
+  difficulty?: ('Beginner' | 'Intermediate' | 'Advanced' | 'Master-Level') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -107,6 +207,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'wizards';
+        value: number | Wizard;
+      } | null)
+    | ({
+        relationTo: 'Houses';
+        value: number | House;
+      } | null)
+    | ({
+        relationTo: 'Spells';
+        value: number | Spell;
+      } | null)
+    | ({
+        relationTo: 'wands';
+        value: number | Wand;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -182,6 +298,83 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wizards_select".
+ */
+export interface WizardsSelect<T extends boolean = true> {
+  name?: T;
+  Photo?: T;
+  Info?:
+    | T
+    | {
+        House?: T;
+        Bio?: T;
+      };
+  Wands?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Houses_select".
+ */
+export interface HousesSelect<T extends boolean = true> {
+  name?: T;
+  embelem?: T;
+  Description?: T;
+  Attributes?:
+    | T
+    | {
+        Animal?: T;
+        Motto?: T;
+        Traits?: T;
+        Colors?: T;
+        Founder?: T;
+      };
+  notableMembers?:
+    | T
+    | {
+        Wizard?: T;
+        id?: T;
+      };
+  Members?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Spells_select".
+ */
+export interface SpellsSelect<T extends boolean = true> {
+  name?: T;
+  Icon?: T;
+  'Spell Type'?: T;
+  Description?: T;
+  category?: T;
+  difficulty?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wands_select".
+ */
+export interface WandsSelect<T extends boolean = true> {
+  name?: T;
+  owner?: T;
+  'Wood Type'?: T;
+  'Core Type'?: T;
+  description?: T;
+  attributes?:
+    | T
+    | {
+        length?: T;
+        flexibility?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
