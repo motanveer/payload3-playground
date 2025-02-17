@@ -134,15 +134,18 @@ export interface Wizard {
 export interface House {
   id: number;
   name: string;
-  embelem?: (number | null) | Media;
-  Description?: string | null;
-  Attributes?: {
+  slug?: string | null;
+  slugLock?: boolean | null;
+  meta?: {};
+  attributes?: {
     Animal?: string | null;
     Motto?: string | null;
     Traits?: string | null;
     Colors?: string | null;
     Founder?: string | null;
   };
+  embelem?: (number | null) | Media;
+  Description?: string | null;
   notableMembers?:
     | {
         Wizard?: (number | null) | Wizard;
@@ -322,9 +325,10 @@ export interface WizardsSelect<T extends boolean = true> {
  */
 export interface HousesSelect<T extends boolean = true> {
   name?: T;
-  embelem?: T;
-  Description?: T;
-  Attributes?:
+  slug?: T;
+  slugLock?: T;
+  meta?: T | {};
+  attributes?:
     | T
     | {
         Animal?: T;
@@ -333,6 +337,8 @@ export interface HousesSelect<T extends boolean = true> {
         Colors?: T;
         Founder?: T;
       };
+  embelem?: T;
+  Description?: T;
   notableMembers?:
     | T
     | {

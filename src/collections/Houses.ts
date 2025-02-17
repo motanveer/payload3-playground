@@ -1,11 +1,15 @@
-import { join } from 'path'
 import type { CollectionConfig } from 'payload'
+import { slugField } from '@/fields/slug'
+
 
 export const Houses: CollectionConfig = {
     slug: 'Houses',
     admin: {
       useAsTitle: 'name',
-      defaultColumns: ['name', 'Description']
+      defaultColumns: ['name', 'Description'],
+      livePreview:{
+       url: ({ data }) => `${process.env.NEXT_PUBLIC_PAYLOAD_URL}/Houses/${data.slug}`,
+      }
     },
     fields: [
       {
@@ -13,6 +17,42 @@ export const Houses: CollectionConfig = {
         type: 'text',
         required: true
       },
+      ...slugField(),
+      {
+        type: 'tabs',
+        tabs:[
+          {name: 'meta',
+            fields:[
+             
+            ]
+          },
+          {name: 'attributes',
+            fields: [
+              {
+                  name: 'Animal',
+                  type: 'text'
+              },
+              {
+                  name: 'Motto',
+                  type: 'text',
+              },
+              {
+                  name: 'Traits',
+                  type: 'text'
+              },
+              {
+                  name: 'Colors',
+                  type: 'text'
+              },
+              {
+                  name: 'Founder',
+                  type: 'text',
+              }
+          ]
+          }
+        ]
+      },
+     
       {
         name: 'embelem',
         type: 'upload',
@@ -21,32 +61,6 @@ export const Houses: CollectionConfig = {
       {
         name: 'Description',
         type: 'textarea'
-      },
-      {
-        name: 'Attributes',
-        type: 'group',
-        fields: [
-            {
-                name: 'Animal',
-                type: 'text'
-            },
-            {
-                name: 'Motto',
-                type: 'text',
-            },
-            {
-                name: 'Traits',
-                type: 'text'
-            },
-            {
-                name: 'Colors',
-                type: 'text'
-            },
-            {
-                name: 'Founder',
-                type: 'text',
-            }
-        ],
       },
       {
         name: 'notableMembers',
@@ -70,5 +84,6 @@ export const Houses: CollectionConfig = {
         }
       }
     ],
+    
   }
   

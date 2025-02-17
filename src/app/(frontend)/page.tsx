@@ -1,6 +1,7 @@
 import Image from "next/image";
 import payloadAPI from "@/lib/payload";
 import { House, Wizard } from "@/payload-types";
+import { RefreshRouteOnSave } from "@/components/RefreshRouteOnSave";
 
 import {
   Card,
@@ -11,29 +12,30 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Houses } from "@/collections/Houses";
+import { Separator } from "@/components/ui/separator";
 
-
-const result = await payloadAPI.find({
-  collection: 'wizards', // required
-  depth: 5,
-})
-
-//Query House collection
-const houseResponse = await payloadAPI.find({
-  collection: 'Houses',
-})
-
-//Store response in a type-safe structure
-const houses: House[] = houseResponse.docs
-
-
-console.log(houses)
-
-export default function Home() {
-  console.log(houses)
+export default async function Home() {
+  const result = await payloadAPI.find({
+    collection: 'wizards', // required
+    depth: 5,
+  })
+  
+  //Query House collection
+  const houseResponse = await payloadAPI.find({
+    collection: 'Houses',
+  })
+  
+  //Store response in a type-safe structure
+  const houses: House[] = houseResponse.docs
+  
+  
+  
+  
+  //console.log(houses)
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+      <RefreshRouteOnSave />
         <Image
           className="dark:invert self-center"
           src="/next.svg"
@@ -43,26 +45,23 @@ export default function Home() {
           priority
         />
 
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-8 md:flex-row">
 
         {
           houses.map((House, index) =>{
             let members = House.Members?.docs;
-            console.log(members)
+            
             return(
-            <Card key={index}>
+            <Card key={index} className="p-4 hover:cursor-pointer hover:translate-y-4 hover:px-12 hover:scale-105 hover:border-black transform-gpu group">
               <CardHeader>
-                <CardTitle>{House.name}</CardTitle>
+                <CardTitle className="text-lg font-bol group-hover:translate">{House.name}</CardTitle>
                 <CardDescription>{House.Description}</CardDescription>
               </CardHeader>
+              <Separator className="mb-4"/>
               <CardContent>
-               {
-                members?.map((wiz: Wizard, index) =>{
-                  return(
-                    <h3>{wiz.name}</h3>
-                  )
-                })
-               }
+               <p className="text-sm"><span className="font-semibold">Animal: </span>{House.Attributes?.Animal}</p>
+               <p className="text-sm"><span className="font-semibold">Colors: </span>{House.Attributes?.Colors}</p>
+               <p className="text-sm"><span className="font-semibold">Founder: </span>{House.Attributes?.Founder}</p>
               </CardContent>
             </Card>
             )
@@ -121,3 +120,4 @@ export default function Home() {
     </div>
   );
 }
+
