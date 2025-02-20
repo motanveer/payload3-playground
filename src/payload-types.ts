@@ -115,6 +115,8 @@ export interface Media {
 export interface Wizard {
   id: number;
   name?: string | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
   Photo?: (number | null) | Media;
   Info?: {
     House?: (number | null) | House;
@@ -308,6 +310,8 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface WizardsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
+  slugLock?: T;
   Photo?: T;
   Info?:
     | T
