@@ -20,26 +20,30 @@ import { RefreshRouteOnSave } from '@/components/RefreshRouteOnSave'
  * @returns {Promise<JSX.Element>} Rendered wizard view component
  */
 const WizardView = async ({ params }: { params: { slug: string } }) => {
-
-    let {slug} = await params
-    slug = slug.toLowerCase()
+    const { slug } = params
+    const normalizedSlug = slug.toLowerCase()
 
     const wizardResponse = await payloadAPI.find({
         collection: 'wizards',
-        where: {slug: {equals: slug}}
+        where: { slug: { equals: normalizedSlug } }
     })
     
     console.log("🔥",wizardResponse)
 
     const wizard: Wizard = wizardResponse.docs[0]
     
+    // Add type guard for House
+    type HouseType = { name: string }
+    const isHouseObject = (house: any): house is HouseType => 
+        typeof house === 'object' && house !== null && typeof house.name === 'string'
+
     return (
         <div className="container mx-auto py-8 px-4">
-            <RefreshRouteOnSave collection="wizards" />
-            <Card className="max-w-md mx-auto  border-black border-2 shadow-none ">
+            <RefreshRouteOnSave />
+            <Card className="max-w-md mx-auto border-black border-2 shadow-none">
                 <CardHeader className="border-b border-black">
                     <CardTitle className="text-2xl font-bold">{wizard.name}</CardTitle>
-                    {wizard.Info?.House?.name && (
+                    {wizard.Info?.House && isHouseObject(wizard.Info.House) && (
                         <CardDescription className="text-md">
                             {wizard.Info.House.name}
                         </CardDescription>
@@ -49,8 +53,8 @@ const WizardView = async ({ params }: { params: { slug: string } }) => {
                     {wizard.Photo && (
                         <div>
                             <img 
-                                src={wizard.Photo.url} 
-                                alt={wizard.Photo.alt || wizard.name}
+                                src={typeof wizard.Photo === 'object' && wizard.Photo !== null ? wizard.Photo.url : ''} 
+                                alt={typeof wizard.Photo === 'object' && wizard.Photo !== null ? wizard.Photo.alt ?? wizard.name : wizard.name}
                                 className="w-[1/2] max-h-[400px] object-cover"
                             />
                         </div>
@@ -63,7 +67,7 @@ const WizardView = async ({ params }: { params: { slug: string } }) => {
                         </div>
                     )}
 
-                    {wizard.Wands?.docs.length > 0 && (
+                    {wizard.Wands?.docs && wizard.Wands.docs.length > 0 && (
                         <div>
                             <h3 className="text-lg font-semibold mb-3">Wands</h3>
                             <div className="space-y-3">
@@ -71,8 +75,9 @@ const WizardView = async ({ params }: { params: { slug: string } }) => {
                                     <div key={wand.id} className="border-b border-gray-100 pb-3">
                                         <h4 className="text-sm font-medium mb-1">{wand.name}</h4>
                                         <p className="text-sm text-gray-600">
-                                            {wand['Wood Type']} wood, {wand['Core Type']} core, 
-                                            {wand.attributes?.length}" {wand.attributes?.flexibility}
+                                            {wand['Wood Type']} wood, {wand['Core Type']} core
+                                            {wand.attributes?.length ? `, ${wand.attributes.length}"` : ''}
+                                            {wand.attributes?.flexibility ? `, ${wand.attributes.flexibility}` : ''}
                                         </p>
                                         {wand.description && (
                                             <p className="text-sm text-gray-500 mt-1">{wand.description}</p>
@@ -100,19 +105,14 @@ export default WizardView
  * @returns {Promise<Array<{slug: string}>>} Array of slug parameters for each wizard
  */
 export const generateStaticParams = async () => {
-
-    //Get data from payload
     const data = await payloadAPI.find({
         collection: 'wizards',
         limit: 100
     })
     
-    const params = data.docs.map((wizard: Wizard) => (
-        console.log("😡",wizard.slug),
-        {
-            slug: wizard.slug
-        }
-    ))
+    const params = data.docs.map((wizard: Wizard) => ({
+        slug: wizard.slug
+    }))
 
     return params
 }
